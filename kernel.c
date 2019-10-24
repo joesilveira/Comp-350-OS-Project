@@ -15,13 +15,17 @@ void main()
 		vidMemOffset++;
 		letters++;
 	}
-	interrupt(0x10,0xe*256+'Q',0,0,0);
+	printString("Hello World!\0");
 	while(1);
 
 }
 
 void printString(char* chars){
+	int i = 0;
+	while(chars[i]!=0x0){
 
-
+	interrupt(0x10,0xe*256+chars[i],0,0,0);
+	i++;
+	}
 
 }
