@@ -16,6 +16,7 @@ void main()
 	interrupt(0x21,0,buffer,0,0);
 	interrupt(0x21,2,buffer,30,0);
 	interrupt(0x21,0,buffer,0,0);
+	interrupt(0x21,5,0,0,0);
 
 	while(1);
 
@@ -88,6 +89,10 @@ void handleInterrupt21(int ax,int bx,int cx,int dx){
 	}else if(ax==2){
 
 	readSector(bx,cx);
+
+	}else{
+
+	printString("ERROR no such function exists");
 
 	}
 
