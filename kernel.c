@@ -1,29 +1,22 @@
+//Alex Stalter
+
 #include <stdio.h>
 
 void printString(char*);
 void printChar(char);
 void readString(char*);
-
+void readSector(char*,int);
+void handleInterrupt21(int,int,int,int,int);
 
 void main()
 {
-//	int startVidMem = 0xb800;
-//	int vidMemOffset = 0x0;
-//	int white = 0x7;
-//	char* letters = "Hello World!\0";
-//	while(*letters !=0x0){
-//		putInMemory(startVidMem,vidMemOffset,*letters);
-//		vidMemOffset++;
-//		putInMemory(startVidMem,vidMemOffset,white);
-//		vidMemOffset++;
-//		letters++;
-//	}
+	char* buffer[512];
+	makeInterrupt21();
+	interrupt(0x21,1,buffer,0,0);
+	interrupt(0x21,0,buffer,0,0);
+	interrupt(0x21,2,buffer,30,0);
+	interrupt(0x21,0,buffer,0,0);
 
-//	printString("Hello World! how are you today?\0");
-	char* line[80];
-	printString("Enter a line: ");
-	readString(line);
-	printString(line);
 	while(1);
 
 }
@@ -36,6 +29,7 @@ void printString(char* chars){
 	i++;
 	}
 
+
 }
 
 void printChar(char c){
@@ -45,10 +39,10 @@ void readString(char* line){
 
 	int i =0;
 	int exit =0;
+	printString("Enter a line: \0");
 	while(exit==0){
 
 	char input = interrupt(0x16,0,0,0,0);
-
 	if(input==0xd){
 	printChar(0xd);
 	line[i]=0xd;
@@ -57,22 +51,44 @@ void readString(char* line){
 	i++;
 	printChar(0xa);
 	line[i]=0x0;
-//	printString("Enter has been pressed\0");
+
 	exit=1;
 
-	}else if(input==0x8){
+	}else if(input==0x8 && i!=0){
 	printChar(0x8);
 	printChar(' ');
 	printChar(0x8);
-		if(i>0){
-
-		i--;
-		}
-	}else{
+	i--;
+	}else if(input!=0x8){
 	line[i]=input;
 	printChar(input);
 	i++;
 	}
+	}
+
+
+}
+void readSector(char* buffer,int sector){
+
+	int ax = 2*256+1;
+	int cx = 0*256+(sector+1);
+	int dx = 0*256+0x80;
+	interrupt(0x13,ax,buffer,cx,dx);
+
+}
+
+void handleInterrupt21(int ax,int bx,int cx,int dx){
+
+	if(ax==0){
+	printString(bx);
+	}else if(ax==1){
+
+	readString(bx);
+
+	}else if(ax==2){
+
+	readSector(bx,cx);
+
 	}
 
 
