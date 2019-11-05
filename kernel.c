@@ -11,10 +11,10 @@ void readFile(char*,char*,int*);
 void main()
 {
 	char buffer[13312];
-	int sectorsread;
+	int sectorsRead;
 	makeInterrupt21();
-	interrupt(0x21,3,"messag",buffer,&sectorsread);
-	if(sectorsread>0){
+	interrupt(0x21,3,"messag",buffer,&sectorsRead);
+	if(sectorsRead>0){
 
 		interrupt(0x21,0,buffer,0,0);
 		printChar('A');
@@ -131,7 +131,7 @@ void readFile(char* address,char* buffer,int* sectorsRead){
 		}
 
 		}
-	sectorsRead = 5;
+	*sectorsRead = 0;
 
 	}
 
