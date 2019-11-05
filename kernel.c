@@ -113,17 +113,22 @@ void handleInterrupt21(int ax,int bx,int cx,int dx){
 void readFile(char* address,char* buffer,int* sectorsRead){
 	int count=0;
 	int i=0;
-	char* dir[512];
+	char dir[512];
 
 	readSector(dir,2);
-	printChar(dir[2]);
-	for(count=0;count<64;count=count+16)
+	for(count=0;count<512;count=count+32)
 	{
-
 		for(i=0;i<6;i++)
 		{
 
-		printChar(address[i]);
+		if(address[i]==dir[i+count]){
+
+		printChar(dir[i+count]);
+
+		}else{
+
+		break;
+		}
 
 		}
 	printChar(0xd);
