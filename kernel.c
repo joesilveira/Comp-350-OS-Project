@@ -131,9 +131,7 @@ void readFile(char* address,char* buffer,int* sectorsRead){
 		}
 
 		}
-	printChar(0xd);
-	printChar(0xa);
-	sectorsRead++;
+	sectorsRead = 5;
 
 	}
 
