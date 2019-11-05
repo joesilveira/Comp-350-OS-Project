@@ -7,17 +7,23 @@ void printChar(char);
 void readString(char*);
 void readSector(char*,int);
 void handleInterrupt21(int,int,int,int,int);
-void readFile(int,char*,int);
+void readFile(char*,char*,int*);
 void main()
 {
-	char* buffer[512];
-	printString("Testing printString \n\r\0 if you see this it has not worked");
+	char buffer[13312];
+	int sectorsread;
 	makeInterrupt21();
-	interrupt(0x21,1,buffer,0,0);
-	interrupt(0x21,0,buffer,0,0);
-	interrupt(0x21,2,buffer,5,0);
-	interrupt(0x21,0,buffer,0,0);
-	interrupt(0x21,5,0,0,0);
+	interrupt(0x21,3,"messag",buffer,&sectorsread);
+	if(sectorsread>0){
+
+		interrupt(0x21,0,buffer,0,0);
+		printChar('A');
+
+	}else{
+
+	interrupt(0x21,0,"messag not found\r\n",0,0);
+
+	}
 
 	while(1);
 
@@ -104,8 +110,28 @@ void handleInterrupt21(int ax,int bx,int cx,int dx){
 
 }
 
-void readFile(int address,char* buffer,int sectorsRead){
+void readFile(char* address,char* buffer,int* sectorsRead){
+	int count=0;
+	int i=0;
+	char* dir[512];
 
+	readSector(dir,2);
+	printChar(dir[2]);
+	for(count=0;count<64;count=count+16)
+	{
 
+		for(i=0;i<6;i++)
+		{
+
+		printChar(address[i]);
+
+		}
+	printChar(0xd);
+	printChar(0xa);
+	sectorsRead++;
+
+	}
 
 }
+
+
