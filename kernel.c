@@ -17,7 +17,6 @@ void main()
 	if(sectorsRead>0){
 
 		interrupt(0x21,0,buffer,0,0);
-		printChar('A');
 
 	}else{
 
@@ -46,7 +45,6 @@ void readString(char* line){
 
 	int i =0;
 	int exit =0;
-	printString("Enter a line: \0");
 	while(exit==0){
 
 	char input = interrupt(0x16,0,0,0,0);
@@ -113,28 +111,44 @@ void handleInterrupt21(int ax,int bx,int cx,int dx){
 void readFile(char* address,char* buffer,int* sectorsRead){
 	int count=0;
 	int i=0;
+	int matches = 0;
 	char dir[512];
 
 	readSector(dir,2);
 	for(count=0;count<512;count=count+32)
 	{
+
+
+	*sectorsRead=*sectorsRead+1;
+
 		for(i=0;i<6;i++)
 		{
 
 		if(address[i]==dir[i+count]){
 
-		printChar(dir[i+count]);
+		matches++;
+//		printChar(dir[i+count]);
 
 		}else{
 
+		matches==0;
 		break;
 		}
 
 		}
-	*sectorsRead = 0;
+
+
+	if(matches==6){
+	readSector(buffer,*sectorsRead+4);
+	break;
+
+}
 
 	}
-
+	if(matches!=6){
+	*sectorsRead=0;
+	printString("/nError file not found.");
+}
 }
 
 
