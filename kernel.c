@@ -1,6 +1,6 @@
 //Alex Stalter
 //also Jack Nichols
-#include <stdio.h>
+//#include <stdio.h>
 
 void printString(char*);
 void printChar(char);
@@ -9,12 +9,14 @@ void readSector(char*,int);
 void handleInterrupt21(int,int,int,int,int);
 void readFile(char*,char*,int*);
 void executeProgram(char*);
+void terminate();
 void main()
 {
 	//char buffer[13312];
 	//int sectorsRead;
 	makeInterrupt21();
-	interrupt(0x21,4,"tstpr1",0,0);
+	interrupt(0x21,5,"tstpr2",0,0);
+	//interrupt(0x21,4,"tstpr1",0,0);
 	//makeInterrupt21();
 	//interrupt(0x21,3,"messag",buffer,&sectorsRead);
 	//if(sectorsRead>0){
@@ -106,6 +108,10 @@ void handleInterrupt21(int ax,int bx,int cx,int dx){
 
 	executeProgram(bx);
 
+	}else if(ax==5){
+	
+	terminate();
+
 	}else{
 
 	printString("ERROR no such function exists\n");
@@ -176,6 +182,9 @@ void executeProgram(char* name)
 
 }
 
-
+void terminate()
+{
+	while(1);
+}
 
 
