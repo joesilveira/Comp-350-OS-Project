@@ -1,6 +1,6 @@
 //Alex Stalter
-
-#include <stdio.h>
+//also Jack Nichols
+//#include <stdio.h>
 
 void printString(char*);
 void printChar(char);
@@ -8,21 +8,26 @@ void readString(char*);
 void readSector(char*,int);
 void handleInterrupt21(int,int,int,int,int);
 void readFile(char*,char*,int*);
+void executeProgram(char*);
+void terminate();
 void main()
 {
-	char buffer[13312];
-	int sectorsRead;
+	//char buffer[13312];
+	//int sectorsRead;
 	makeInterrupt21();
-	interrupt(0x21,3,"messag",buffer,&sectorsRead);
-	if(sectorsRead>0){
+	interrupt(0x21,5,"tstpr2",0,0);
+	//interrupt(0x21,4,"tstpr1",0,0);
+	//makeInterrupt21();
+	//interrupt(0x21,3,"messag",buffer,&sectorsRead);
+	//if(sectorsRead>0){
 
-		interrupt(0x21,0,buffer,0,0);
+	//	interrupt(0x21,0,buffer,0,0);
 
-	}else{
+	//}else{
 
-	interrupt(0x21,0,"messag not found\r\n",0,0);
+	//interrupt(0x21,0,"messag not found\r\n",0,0);
 
-	}
+	//}
 
 	while(1);
 
@@ -98,6 +103,14 @@ void handleInterrupt21(int ax,int bx,int cx,int dx){
 	}else if(ax==3){
 
 	readFile(bx,cx,dx);
+	
+	}else if(ax==4){
+
+	executeProgram(bx);
+
+	}else if(ax==5){
+	
+	terminate();
 
 	}else{
 
@@ -149,6 +162,29 @@ void readFile(char* address,char* buffer,int* sectorsRead){
 	*sectorsRead=0;
 	printString("/nError file not found.");
 }
+
+}
+void executeProgram(char* name)
+{
+	int i;
+	char buffer[13312];
+	int segment = 0x2000;
+
+	readFile(name, buffer);
+
+	for(i = 0; i < 13312; i++)
+	{
+		putInMemory(segment, i, buffer[i]);
+	}
+
+	launchProgram(segment);
+
+
+}
+
+void terminate()
+{
+	while(1);
 }
 
 
