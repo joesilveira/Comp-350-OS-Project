@@ -12,23 +12,9 @@ void executeProgram(char*);
 void terminate();
 void main()
 {
-	//char buffer[13312];
-	//int sectorsRead;
+
 	makeInterrupt21();
-	interrupt(0x21,5,"tstpr2",0,0);
-	//interrupt(0x21,4,"tstpr1",0,0);
-	//makeInterrupt21();
-	//interrupt(0x21,3,"messag",buffer,&sectorsRead);
-	//if(sectorsRead>0){
-
-	//	interrupt(0x21,0,buffer,0,0);
-
-	//}else{
-
-	//interrupt(0x21,0,"messag not found\r\n",0,0);
-
-	//}
-
+	interrupt(0x21,4,"shell",0,0);
 	while(1);
 
 }
@@ -144,7 +130,7 @@ void readFile(char* address,char* buffer,int* sectorsRead){
 
 		}else{
 
-		matches==0;
+		matches=0;
 		break;
 		}
 
@@ -184,7 +170,16 @@ void executeProgram(char* name)
 
 void terminate()
 {
-	while(1);
+
+	char shell[6];
+	shell[0] = 's';
+	shell[1] = 'h';
+	shell[2] = 'e';
+	shell[3] = 'l';
+	shell[4] = 'l';
+	shell[5] = '\0';
+	executeProgram(shell);
+
 }
 
 
