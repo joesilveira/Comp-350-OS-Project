@@ -1,4 +1,6 @@
 //Alex Stalter
+//joe silveira
+
 
 void main(){
 
@@ -14,63 +16,73 @@ void main(){
 	while(1){
 
 
-	char line[512];
-	char filename[6];
-	char programName[6];
-	char fileBuff[512];
-	int sectorsRead;
-	int i;
-	int pos;
-	int pos2;
-	
+		char line[512];
+		char filename[6];
+		char programName[6];
+		char fileBuff[512];
+		int sectorsRead;
+		int i;
+		int pos;
+		int pos2;
+
 	//syscall(0,"\n");
-	syscall(0,"SHELL>");
-	syscall(1,line);
+		syscall(0,"SHELL>");
+		syscall(1,line);
 
 
 
-	if(line[0]=='e'&&line[1]=='x'&&line[2]=='i'&&line[3]=='t'){
-		syscall(5);
+		if(line[0]=='e'&&line[1]=='x'&&line[2]=='i'&&line[3]=='t'){
+			syscall(5);
 
-	}else if(line[0]=='t'&&line[1]=='y'&&line[2]=='p'&&line[3]=='e'){
+		}else if(line[0]=='d'&&line[1]=='i'&&line[2]=='r'){
+
+			syscall(0,"Test printing\r\n");
+
+			syscall(6); //this should print "Calling function" from kernel.c  
+			syscall(7);//This shoudl call the function test() in kernel c
+			syscall(0,"\r\n");
+			break;
+
+		}else if(line[0]=='t'&&line[1]=='y'&&line[2]=='p'&&line[3]=='e'){
 
 
 		//If the char at line[5] exists 
-		pos = 5;
+			pos = 5;
 
-		if(line[5] != 0x0){
+			if(line[5] != 0x0){
 
 			//Loop through the user entry
-			for(i = 0; i < 6; i++){
-				filename[i] = line[pos + i];	
-			}
+				for(i = 0; i < 6; i++){
+					filename[i] = line[pos + i];	
+				}
 
-			filename[6] = 0x0;
+				filename[6] = 0x0;
 
-			syscall(3,filename,fileBuff,&sectorsRead);
+				syscall(3,filename,fileBuff);
 
-			if(sectorsRead>0){
-				syscall(0,fileBuff);
-				syscall(0,"\r\n");
-				break;
+				if(sectorsRead>0){
+					syscall(0,fileBuff);
+					syscall(0,"\r\n");
+					break;
+				}else{
+
+					syscall(0,"\r\nNo File found with the specified name\n\r");
+					break;
+				}
 			}else{
-
-				syscall(0,"\r\nNo File found with the specified name\n\r");
+				syscall(0,"\r\nPlease enter a file name\n\r");
 				break;
 			}
-		}else{
-			break;
-		}
 
 		//break;
 
-	}else if(line[0]=='e'&&line[1]=='x'&&line[2]=='e'&&line[3]=='c'){
+		}else if(line[0]=='e'&&line[1]=='x'&&line[2]=='e'&&line[3]=='c'){
 
 //		syscall(0,"exec");
 
 //		 pos2 = 5;
 
-		 if(line[5] != 0x0){
+			if(line[5] != 0x0){
 
 		 	//Loop through the user entry
 //		 	for(i = 0; i < 6; i++){
@@ -79,18 +91,21 @@ void main(){
 
 //		 	programName[6] = 0x0;
 
-		 	syscall(4,line+5);
+				syscall(4,line+5);
 
-		 }else{
-		 	break;
-		 }
+			}else{
+				syscall(0,"\r\nPlease enter a program name\n\r");
+				break;
+			}
 
 
+		}else {
 
-	}else {
+			syscall(0,"Invalid Input\n");
+			syscall(5);
 
-	syscall(0,"Invalid Input\n");
+		}
 
 	}
 }
-}
+
