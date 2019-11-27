@@ -110,6 +110,15 @@ void main(){
 
                                 syscall(7,filename);
 
+		}else if(line[0]=='c'&&line[1]=='o'&&line[2]=='p'&&line[3]=='y'){
+
+		syscall(0,"Welcome to the compy function!\n\r");
+
+
+		}else if(line[0]=='c'&&line[1]=='r'&&line[2]=='e'&&line[3]=='a'&&line[4]=='t'&&line[5]=='e'){
+
+		syscall(0,"Welcome to the create function!\n\r");
+
 		}else {
 
 			syscall(0,"Invalid Input\n\r");

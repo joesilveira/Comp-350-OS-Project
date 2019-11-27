@@ -14,12 +14,13 @@ void executeProgram(char*);
 void terminate();
 void listDir();
 void deleteFile(char*);
-
+void writeFile(char*,char*,int);
 
 void main()
 {
 
 	makeInterrupt21();
+	interrupt(0x21,8,"this is a test message","testmg",3);
 	interrupt(0x21,4,"shell",0,0);
 	while(1);
 
@@ -120,7 +121,7 @@ void handleInterrupt21(int ax,int bx,int cx,int dx){
 
 	}else if(ax==8) {
 
-
+	writeFile(bx,cx,dx);
 
 	}else if(ax==9){
 
@@ -367,7 +368,13 @@ void deleteFile(char* name)
 
 	for(j=0;j<6;j++){
 
-	if(name[j]!=dir[j+i]){
+	if(dir[j+i]=='l'&&name[j]=='l'&&dir[j+i+1]=='l'&&name[j+1]=='l'){
+
+	matches=1;
+	break;
+
+	}else if(name[j]!=dir[j+i]){
+
 
 	break;
 
@@ -390,7 +397,7 @@ void deleteFile(char* name)
 	matches=dir[i+found];
 	map[matches]=0;
 
-	}else{
+	}else if(dir[i+found]==0&&dir[i+found+1]==0){
 
 	break;
 
@@ -406,6 +413,104 @@ void deleteFile(char* name)
 
 
 
+
+}
+void writeFile(char* buffer,char* file,int sectors){
+
+	char map[512];
+	char dir[512];
+	int i,j,k,address,sector;
+
+
+	readSector(map,1);
+	readSector(dir,2);
+	for(i=0;i<512;i+=32){
+
+		if(dir[i]=='\0'){
+
+			for(j=0;j<6;j++){
+
+				if(file[j]=='\0'){
+
+
+					for(k=0;k<(6-j);k++){
+
+					dir[i+j+k]='\0';
+
+					}
+					break;
+
+				}else{
+
+					dir[i+j]=file[j];
+
+				}
+
+			}
+
+		}
+			for(sector=3;sector<32;sector++){
+
+				if(map[sector]==0){
+
+					map[sector]=255;
+
+					break;
+				}
+
+
+			}
+			for(j=0;j<sectors+1;i++){
+
+				for(k=6;k<26;k++){
+
+					if(dir[i+k]==0){
+
+					dir[i+k]=sector;
+					break;
+
+					}
+
+				}
+				address=buffer+j*512;
+				writeSector(address,sector);
+				sector++;
+
+				if(map[sector]==255){
+
+					for(k=sector;k<32;k++){
+
+						if(map[k]==0){
+
+							sector=k;
+							break;
+
+						}
+
+					}
+
+
+				}
+				map[sector]=255;
+				if(j==sectors){
+
+					for(k=6+j;k<26-j;k++){
+
+						dir[i+k]='\0';
+
+					}
+
+				}
+
+
+
+			}
+
+
+			writeSector(map,1);
+			writeSector(dir,2);
+			break;
+	}
 
 }
 
