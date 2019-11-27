@@ -98,6 +98,18 @@ void main(){
 			}
 
 
+		}else if(line[0]=='d'&&line[1]=='e'&&line[2]=='l'){
+		
+
+			  	for(i = 0; i < 6; i++)
+				{
+        	      	                filename[i] = line[4 + i];    
+                	        }
+
+                                filename[6] = 0x0;
+
+                                syscall(7,filename);
+
 		}else {
 
 			syscall(0,"Invalid Input\n\r");

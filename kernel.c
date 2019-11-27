@@ -116,7 +116,7 @@ void handleInterrupt21(int ax,int bx,int cx,int dx){
 
 	}else if(ax==7) {
 
-	
+	deleteFile(bx);
 
 	}else if(ax==8) {
 
@@ -353,5 +353,59 @@ void terminate()
 	executeProgram(shell);
 
 }
+void deleteFile(char* name)
+{
+	char dir[512];
+	char map[512];
+	int matches;
+	int i, j;
+	int found, index;
 
+	readSector(map, 1);
+	readSector(dir, 2);
+	for(i = 0;i<512;i+=32){
+
+	for(j=0;j<6;j++){
+
+	if(name[j]!=dir[j+i]){
+
+	break;
+
+	}else if(j==5){
+
+	matches=1;
+	break;
+
+	}
+
+	}
+
+	if(matches==1){
+
+	dir[i]=0x0;
+	for(found=6;found<32;found++){
+
+	if(dir[i+found]!=0){
+
+	matches=dir[i+found];
+	map[matches]=0;
+
+	}else{
+
+	break;
+
+	}
+
+	}
+	writeSector(dir,2);
+	writeSector(map,1);
+	break;
+	}
+
+	}
+
+
+
+
+}
 
