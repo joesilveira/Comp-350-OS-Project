@@ -448,7 +448,6 @@ void writeFile(char* buffer,char* file,int sectors){
 
 			}
 
-		}
 			for(sector=3;sector<32;sector++){
 
 				if(map[sector]==0){
@@ -460,7 +459,7 @@ void writeFile(char* buffer,char* file,int sectors){
 
 
 			}
-			for(j=0;j<sectors+1;i++){
+			for(j=0;j<sectors+1;j++){
 
 				for(k=6;k<26;k++){
 
@@ -510,6 +509,8 @@ void writeFile(char* buffer,char* file,int sectors){
 			writeSector(map,1);
 			writeSector(dir,2);
 			break;
+
+		}
 	}
 
 }
