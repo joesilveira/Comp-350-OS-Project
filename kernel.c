@@ -210,16 +210,16 @@ void readFile(char* fileName , char* fileBuffer,int* sectorsRead) {
 		if(buffer[i] != fileName[matches]){
 
 			//2.2 if it doesnt match go to the next sector
-			i+=31;
+			i+=31-matches;
 			matches = 0;
-			*sectorsRead = *sectorsRead +1;
+			*sectorsRead = 0;
 		}else if (matches == 5){
 			//printString("Matches \n");
 			
 
 			//Loop through the remaining 26 bytes (sectors)
 			for(j = 0; j < 26; j++){
-
+				*sectorsRead++;
 				//If the next sector is empty (== '\0') set the filebuffer to \0 and break
 				if(buffer[j + i + 1] == '\0'){
 
@@ -419,7 +419,7 @@ void writeFile(char* buffer,char* file,int sectors){
 
 	char map[512];
 	char dir[512];
-	int i,j,k,address,sector;
+	int i,j,k,sector,address,sectorsWrote;
 
 
 	readSector(map,1);
@@ -453,27 +453,31 @@ void writeFile(char* buffer,char* file,int sectors){
 				if(map[sector]==0){
 
 					map[sector]=255;
-
-					break;
+					sectorsWrote++;
+					if(sectorsWrote==sectors){
+						sector++;
+						break;
+					}
 				}
 
 
 			}
-			for(j=0;j<sectors+1;j++){
+			for(j=0;j<sectors;j++){
 
 				for(k=6;k<26;k++){
 
 					if(dir[i+k]==0){
 
-					dir[i+k]=sector;
+					dir[i+k]=sector-(sectors-j);
+
 					break;
 
 					}
 
 				}
 				address=buffer+j*512;
-				writeSector(address,sector);
-				sector++;
+				writeSector(address,(sector-(sectors-j)));
+
 
 				if(map[sector]==255){
 
@@ -490,7 +494,7 @@ void writeFile(char* buffer,char* file,int sectors){
 
 
 				}
-				map[sector]=255;
+
 				if(j==sectors){
 
 					for(k=6+j;k<26-j;k++){

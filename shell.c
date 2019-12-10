@@ -18,9 +18,12 @@ void main(){
 		char line[512];
 		char filename[6];
 		char programName[6];
-		char fileBuff[512];
+		char filename1[6];
+		char filename2[6];
+		char buffer[13312];
+		char fileBuff[13312];
 		int sectorsRead;
-		int i;
+		int i,j,k;
 		int pos;
 		int pos2;
 
@@ -56,8 +59,9 @@ void main(){
 				}
 
 				filename[6] = 0x0;
-
+				syscall(0,filename);
 				syscall(3,filename,fileBuff,&sectorsRead);
+				syscall(0,fileBuff);
 
 				if(sectorsRead>0){
 					syscall(0,fileBuff);
@@ -112,13 +116,63 @@ void main(){
 
 		}else if(line[0]=='c'&&line[1]=='o'&&line[2]=='p'&&line[3]=='y'){
 
-		syscall(0,"Welcome to the compy function!\n\r");
+		pos = 5;
+		i = 0;
 
+		for(j = 0;j < 6; j++)
+		{
+			filename1[i] = line[pos + j];
+			i++;
+		}
+		filename1[6] = 0x0;
+//		syscall(0,filename1);
+
+		i =0;
+		for(j = 7; j < 13; j++)
+		{
+			filename2[i] = line[pos + j];
+			i++;
+		}
+		filename2[6] = 0x0;
+//		syscall(0,filename2);
+
+		syscall(3,filename1, buffer, &sectorsRead);
+
+		i = 0;
+		while(buffer[i] != 0x0)
+		{
+			i++;
+		}
+		k = 0;
+		while(k*512 <= i)
+		{
+			k++;
+		}
+
+
+		syscall(8,buffer,filename2,sectorsRead);
 
 		}else if(line[0]=='c'&&line[1]=='r'&&line[2]=='e'&&line[3]=='a'&&line[4]=='t'&&line[5]=='e'){
 
-		syscall(0,"Welcome to the create function!\n\r");
+		pos = 7;
+		for(j=0;j<6;j++){
 
+		filename[j] = line[pos+j];
+
+		}
+		while(1){
+
+		syscall(1,buffer);
+
+		if(buffer[0]=='\r'){
+
+		break;
+
+		}
+
+		}
+
+//		syscall(0,filename);
 		}else {
 
 			syscall(0,"Invalid Input\n\r");
