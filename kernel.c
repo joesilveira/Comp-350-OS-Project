@@ -16,11 +16,12 @@ void listDir();
 void deleteFile(char*);
 void writeFile(char*,char*,int);
 
+
 void main()
 {
 
 	makeInterrupt21();
-	interrupt(0x21,8,"this is a test message","testmg",3);
+	//interrupt(0x21,8,"this is a test message","testmg",3);
 	interrupt(0x21,4,"shell",0,0);
 	while(1);
 
@@ -39,6 +40,8 @@ void printString(char* chars){
 void printChar(char c){
 	interrupt(0x10,0xe*256+c,0,0,0);
 }
+
+
 void readString(char* line){
 
 	int i =0;
@@ -356,166 +359,159 @@ void terminate()
 }
 void deleteFile(char* name)
 {
-	char dir[512];
-	char map[512];
-	int matches;
-	int i, j;
-	int found, index;
 
-	readSector(map, 1);
-	readSector(dir, 2);
-	for(i = 0;i<512;i+=32){
+//Variables and load 512 char arrays
+char map[512];
+char dir[512];
+int i = 0;
+int l = 0;
+int j = 0;
+int k = 0;
+int text;
 
-	for(j=0;j<6;j++){
+readSector(map,1);
+readSector(dir,2);
 
-	if(dir[j+i]=='l'&&name[j]=='l'&&dir[j+i+1]=='l'&&name[j+1]=='l'){
+while(name[i] != '\0'){
+	i++;
+}
 
-	matches=1;
-	break;
+text = i;
 
-	}else if(name[j]!=dir[j+i]){
+//for the 512 character array
+for(k = 0; k <= 512; k++){
 
+	//if the file name length is 6 or the text matches
+	if(j == 6 || j == text && dir[k] == '\0'){
 
-	break;
+		dir[k - j] = '\0';
 
-	}else if(j==5){
+		for(i = 0; i < 26; i++){
 
-	matches=1;
-	break;
-
+			map[k + i] = '\0';
+		}
+		break;
+	}else if(dir[k] == name[j]){
+		j++;
+	}else{
+		k = k - j + 31;
+		j = 0;
 	}
 
-	}
 
-	if(matches==1){
-
-	dir[i]=0x0;
-	for(found=6;found<32;found++){
-
-	if(dir[i+found]!=0){
-
-	matches=dir[i+found];
-	map[matches]=0;
-
-	}else if(dir[i+found]==0&&dir[i+found+1]==0){
-
-	break;
-
-	}
-
-	}
-	writeSector(dir,2);
-	writeSector(map,1);
-	break;
-	}
-
-	}
-
+}
+writeSector(map,1);
+writeSector(dir,2);
 
 
 
 }
-void writeFile(char* buffer,char* file,int sectors){
+
+//Revised joe silveira
+//12/10/19
+void writeFile(char* file, char* buffer,int sectors){
+
 
 	char map[512];
 	char dir[512];
-	int i,j,k,sector,address,sectorsWrote;
+	char newFile[512];
+	int i = 0;
+	int x =0;
+	int j = 0;
+	int write =0;
+	int k = 0;
+	int r = 0;
+	int l = 0;
+	int sector = 0;
+	int address = 0;
+	int sectorsWrote = 0;
 
-
+	//Read map and directory
 	readSector(map,1);
 	readSector(dir,2);
-	for(i=0;i<512;i+=32){
 
-		if(dir[i]=='\0'){
+	//for loop to loop through directory
+	for(i = 0;i <= 512; i++){
 
-			for(j=0;j<6;j++){
+		//if the directory buffer at position i is not null
+		if(dir[i] != '\0'){
 
-				if(file[j]=='\0'){
+			//increase i by 32 for the next sector
+			i += 31;
 
+			//reset sector
+			sector = 0;
 
-					for(k=0;k<(6-j);k++){
+		//else write the first six chars of the filename
+		}else if (dir[i] == '\0'){
 
-					dir[i+j+k]='\0';
+				//first 6 chars of filename
+				for(j = 0; j < 6; j++){
 
+					if(write == 1){
+						dir[i + j] = '\0';
 					}
-					break;
 
-				}else{
+					//if th filename is less than six chars fill in with \0
+					else if(file[j] == '\0'){
+						dir[j + i] = '\0';
+						write = 1;
 
-					dir[i+j]=file[j];
+					}else{
+
+					//else write that name to the directory 
+					dir[j + i] = file[j];
 
 				}
-
 			}
 
-			for(sector=3;sector<32;sector++){
+			//for each sector making up the file, write the contents
 
-				if(map[sector]==0){
+			//find free sector by searching map for '0\'
+			for(sector = 0; sector < sectors; sector++){
 
-					map[sector]=255;
-					sectorsWrote++;
-					if(sectorsWrote==sectors){
-						sector++;
-						break;
-					}
-				}
+				//for the 5th line 
+				for(x = 5; x < 512; x++){
 
+					//if the sector on the map is open to write
+					if(map[x] == '\0'){
 
-			}
-			for(j=0;j<sectors;j++){
+						//set sector to 0xff
+						map[x] = 0xFF;
 
-				for(k=6;k<26;k++){
+						//add sector num to file directory 
+						dir[i + 6 + sector] = x;
 
-					if(dir[i+k]==0){
+						//loop through the given contents and create the buffer of new file
+						for(address = 0; address < 512; address++){
 
-					dir[i+k]=sector-(sectors-j);
-
-					break;
-
-					}
-
-				}
-				address=buffer+j*512;
-				writeSector(address,(sector-(sectors-j)));
-
-
-				if(map[sector]==255){
-
-					for(k=sector;k<32;k++){
-
-						if(map[k]==0){
-
-							sector=k;
-							break;
-
+							newFile[address] = buffer[l * 512 + address];
 						}
 
-					}
+						//now write the contents of the newFile buffer to the sector and add to address
+						writeSector(newFile,x);
+						address++;
 
-
-				}
-
-				if(j==sectors){
-
-					for(k=6+j;k<26-j;k++){
-
-						dir[i+k]='\0';
+						break;
 
 					}
-
 				}
-
-
-
 			}
 
+			// for the 26 remaining bytes set it to 0
+			for (sector = sector + 1; sector < 26 - sectors; sector++){
+				dir[i + 6 + sector] = 0x00;
+			}
 
-			writeSector(map,1);
-			writeSector(dir,2);
 			break;
 
 		}
 	}
 
+	//write secotr and map back to disk
+	writeSector(map,1);
+	writeSector(dir,2);
 }
+
+		
 
